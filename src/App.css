@@ -38,6 +38,15 @@
   width: 100%;
 }
 
+/* Canvas + side panel side by side */
+.app-body {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
 /* Toolbar */
 .app-toolbar {
   display: flex;
