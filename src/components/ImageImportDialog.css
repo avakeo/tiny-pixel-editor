@@ -1,0 +1,263 @@
+/* ── Backdrop ───────────────────────────────────────────────────── */
+.dialog-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 16px;
+}
+
+/* ── Dialog box ─────────────────────────────────────────────────── */
+.import-dialog {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 20px;
+  width: 100%;
+  max-width: 420px;
+  max-height: 90svh;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+/* ── Header ─────────────────────────────────────────────────────── */
+.dialog-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 0;
+}
+
+.dialog-title {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--accent);
+}
+
+.dialog-close {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 1rem;
+  cursor: pointer;
+  padding: 4px 6px;
+  border-radius: 4px;
+  line-height: 1;
+  transition: color 0.15s, background 0.15s;
+}
+
+.dialog-close:hover {
+  color: var(--text);
+  background: var(--btn-bg);
+}
+
+/* ── Drop zone ──────────────────────────────────────────────────── */
+.drop-zone {
+  border: 2px dashed var(--border);
+  border-radius: 8px;
+  padding: 24px 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+  user-select: none;
+}
+
+.drop-zone:hover,
+.drop-zone:focus {
+  border-color: var(--accent);
+  outline: none;
+}
+
+.drop-zone.dragging {
+  border-color: var(--accent);
+  background: var(--accent-bg);
+}
+
+.drop-zone.has-image {
+  padding: 12px 16px;
+}
+
+.drop-zone-icon {
+  font-size: 2rem;
+  line-height: 1;
+}
+
+.drop-zone-label {
+  font-size: 0.85rem;
+  color: var(--text);
+  font-weight: 500;
+}
+
+.drop-zone-sub {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+/* ── Error ───────────────────────────────────────────────────────── */
+.import-error {
+  margin: 0;
+  font-size: 0.78rem;
+  color: #ff5f5f;
+  background: rgba(255, 95, 95, 0.1);
+  border: 1px solid rgba(255, 95, 95, 0.3);
+  border-radius: 5px;
+  padding: 6px 10px;
+}
+
+/* ── Options ─────────────────────────────────────────────────────── */
+.import-options {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.option-group {
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 8px 12px;
+  margin: 0;
+  flex: 1;
+  min-width: 120px;
+}
+
+.option-legend {
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  padding: 0 4px;
+}
+
+.option-radio {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.8rem;
+  color: var(--text);
+  cursor: pointer;
+  padding: 2px 0;
+}
+
+.option-radio input[type='radio'] {
+  accent-color: var(--accent);
+}
+
+/* ── Threshold slider ────────────────────────────────────────────── */
+.threshold-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.threshold-label {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+  min-width: 60px;
+}
+
+.threshold-slider {
+  flex: 1;
+  accent-color: var(--accent);
+  cursor: pointer;
+}
+
+.threshold-value {
+  font-size: 0.78rem;
+  color: var(--text);
+  min-width: 28px;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── Preview ─────────────────────────────────────────────────────── */
+.preview-area {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.preview-label {
+  margin: 0;
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.preview-canvas {
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  /* Scale up so it is actually visible */
+  image-rendering: pixelated;
+  max-width: 100%;
+  height: auto;
+  display: block;
+  /* Show a minimum height before image is loaded */
+  min-height: 32px;
+  background: #0d0d0d;
+  /* CSS scale to make tiny canvas visible */
+  width: min(100%, 384px);
+}
+
+/* ── Actions ─────────────────────────────────────────────────────── */
+.dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.action-btn {
+  padding: 7px 18px;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.cancel-btn {
+  background: var(--btn-bg);
+  color: var(--text);
+  border: 1px solid var(--border);
+}
+
+.cancel-btn:hover {
+  border-color: var(--text-muted);
+}
+
+.apply-btn {
+  background: var(--accent-bg);
+  color: var(--accent);
+  border: 1px solid var(--accent);
+}
+
+.apply-btn:hover:not(:disabled) {
+  background: rgba(0, 191, 255, 0.2);
+}
+
+.apply-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* ── Utility ─────────────────────────────────────────────────────── */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}

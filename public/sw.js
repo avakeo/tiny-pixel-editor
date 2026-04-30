@@ -31,7 +31,36 @@ self.addEventListener('activate', (event) => {
   );
 });
 
+// Handle Web Share Target: POST /share-target with a shared image file
 self.addEventListener('fetch', (event) => {
+  const url = new URL(event.request.url);
+
+  if (event.request.method === 'POST' && url.pathname === '/share-target') {
+    event.respondWith(
+      (async () => {
+        const formData = await event.request.formData();
+        const imageFile = formData.get('image');
+
+        // Open (or focus) the app client and pass the shared file via postMessage
+        const clients = await self.clients.matchAll({ type: 'window' });
+        if (clients.length > 0) {
+          const arrayBuffer = await imageFile.arrayBuffer();
+          clients[0].postMessage({
+            type: 'SHARE_TARGET_IMAGE',
+            fileName: imageFile.name,
+            mimeType: imageFile.type,
+            buffer: arrayBuffer,
+          }, [arrayBuffer]);
+          await clients[0].focus();
+        }
+
+        // Redirect back to the app root
+        return Response.redirect('/', 303);
+      })(),
+    );
+    return;
+  }
+
   if (event.request.method !== 'GET') return;
 
   event.respondWith(
