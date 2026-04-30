@@ -1,9 +1,10 @@
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import PixelCanvas, { COLS as DEFAULT_COLS, ROWS as DEFAULT_ROWS } from './components/PixelCanvas';
 import FloatingToolbar from './components/FloatingToolbar';
 import SidePanel from './components/SidePanel';
 import FrameStrip from './components/FrameStrip';
 import { lsGet, lsSet } from './lib/storage';
+import { isMac } from './lib/platform';
 import './App.css';
 
 function makeBlank(cols, rows) {
@@ -130,6 +131,27 @@ export default function App() {
     lsSet('frame:0', next);
     setRedoStack((r) => r.slice(0, -1));
   }, [redoStack]);
+
+  useEffect(() => {
+    function handleKeyDown(e) {
+      const ctrl = isMac() ? e.metaKey : e.ctrlKey;
+      if (!ctrl) return;
+      if (e.key === 'z' || e.key === 'Z') {
+        if (e.shiftKey) {
+          e.preventDefault();
+          handleRedo();
+        } else {
+          e.preventDefault();
+          handleUndo();
+        }
+      } else if (e.key === 'y' || e.key === 'Y') {
+        e.preventDefault();
+        handleRedo();
+      }
+    }
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [handleUndo, handleRedo]);
 
   const handleSizeChange = useCallback(({ cols: newCols, rows: newRows }) => {
     setDisplaySize({ cols: newCols, rows: newRows });
