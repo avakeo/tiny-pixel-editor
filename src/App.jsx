@@ -59,7 +59,24 @@ function generateExport(pixels, cols, rows, language, format) {
   const values = bytes.map((b) => (isHex ? `0x${b.toString(16).padStart(2, '0')}` : String(b)));
 
   if (language === 'MicroPython') {
-    return `# ${cols}x${rows} pixel bitmap\ndata = bytearray([\n  ${values.join(', ')}\n])`;
+    const chunkSize = 16;
+    const chunks = [];
+    for (let i = 0; i < values.length; i += chunkSize) {
+      chunks.push(values.slice(i, i + chunkSize).join(', '));
+    }
+    const dataLines = chunks.map((chunk) => `  ${chunk}`).join(',\n');
+    return [
+      'import framebuf',
+      '',
+      `# ${cols}x${rows} pixel bitmap (MONO_HLSB)`,
+      `data = bytearray([`,
+      dataLines,
+      `])`,
+      `fb = framebuf.FrameBuffer(data, ${cols}, ${rows}, framebuf.MONO_HLSB)`,
+      '',
+      'oled.blit(fb, 0, 0)',
+      'oled.show()',
+    ].join('\n');
   }
   return `// ${cols}x${rows} pixel bitmap\nconst uint8_t bitmap[] PROGMEM = {\n  ${values.join(', ')}\n};`;
 }
@@ -152,6 +169,11 @@ export default function App() {
     URL.revokeObjectURL(url);
   }, [pixels, cols, rows, exportLanguage, exportFormat]);
 
+  const handleCopy = useCallback(() => {
+    const code = generateExport(pixels, cols, rows, exportLanguage, exportFormat);
+    return navigator.clipboard.writeText(code);
+  }, [pixels, cols, rows, exportLanguage, exportFormat]);
+
   return (
     <div className="app">
       <header className="app-header">
@@ -191,6 +213,7 @@ export default function App() {
           exportFormat={exportFormat}
           onExportFormatChange={setExportFormat}
           onExport={handleExport}
+          onCopy={handleCopy}
         />
       </div>
 
