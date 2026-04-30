@@ -1,7 +1,7 @@
 import { useRef, useState, useEffect, useCallback } from 'react';
 import './CanvasViewport.css';
 
-const MIN_ZOOM = 0.5;
+const MIN_ZOOM = 0.25;
 const MAX_ZOOM = 16;
 
 function clamp(v, min, max) {
@@ -73,7 +73,7 @@ export default function CanvasViewport({ children, canvasWidth, canvasHeight }) 
     if (!vp || !canvasWidth || !canvasHeight) return;
     const vpW = vp.clientWidth;
     const vpH = vp.clientHeight;
-    const fitZ = clamp(Math.min(vpW / canvasWidth, vpH / canvasHeight), 0.1, MAX_ZOOM);
+    const fitZ = clamp(Math.min(vpW / canvasWidth, vpH / canvasHeight), MIN_ZOOM, MAX_ZOOM);
     panRef.current = {
       x: (vpW - canvasWidth * fitZ) / 2,
       y: (vpH - canvasHeight * fitZ) / 2,
