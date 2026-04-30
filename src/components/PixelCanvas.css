@@ -1,0 +1,10 @@
+.pixel-canvas {
+  display: block;
+  cursor: crosshair;
+  touch-action: none;
+  border: 1px solid #1e2030;
+  border-radius: 2px;
+  /* Scale down on smaller viewports while keeping aspect ratio */
+  max-width: 100%;
+  height: auto;
+}
