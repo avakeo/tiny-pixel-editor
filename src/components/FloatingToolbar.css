@@ -1,0 +1,71 @@
+/* Floating toolbar — vertical on desktop, horizontal on mobile */
+.floating-toolbar {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 8px 6px;
+  align-self: flex-start;
+  position: sticky;
+  top: 16px;
+  z-index: 10;
+}
+
+.floating-toolbar .tool-btn {
+  background: var(--btn-bg);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  width: 40px;
+  height: 40px;
+  font-size: 1.1rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: border-color 0.15s, background 0.15s, opacity 0.15s;
+  padding: 0;
+}
+
+.floating-toolbar .tool-btn:hover:not(:disabled) {
+  border-color: var(--accent);
+}
+
+.floating-toolbar .tool-btn.active {
+  border-color: var(--accent);
+  background: var(--accent-bg);
+}
+
+.floating-toolbar .tool-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.toolbar-divider {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 4px 0;
+  width: 100%;
+}
+
+/* ── Mobile: horizontal strip ─────────────────────────────────── */
+@media (max-width: 767px) {
+  .floating-toolbar {
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-self: stretch;
+    position: static;
+    padding: 8px;
+  }
+
+  .toolbar-divider {
+    border-top: none;
+    border-left: 1px solid var(--border);
+    height: 32px;
+    width: 0;
+    margin: 0 4px;
+  }
+}
