@@ -1,14 +1,14 @@
 import { useEffect, useRef } from 'react';
 import './PixelCanvas.css';
 
-/** Width/height of each pixel cell in CSS pixels */
 const CELL = 6;
 
-/** Color for an "on" pixel (neon blue, like a real OLED) */
-const PIXEL_ON = '#00c3ff';
-/** Color for an "off" pixel */
-const PIXEL_OFF = '#0d0e14';
-/** Grid line color */
+/** Default OLED display dimensions (128×64) */
+export const COLS = 128;
+export const ROWS = 64;
+
+const PIXEL_ON = '#00bfff';
+const PIXEL_OFF = '#0d0d0d';
 const GRID_COLOR = '#1a1c27';
 
 function drawGrid(ctx, cols, rows, canvasW, canvasH) {
@@ -38,7 +38,14 @@ function drawPixels(ctx, pixels, cols, rows) {
   }
 }
 
-export default function PixelCanvas({ pixels, onPixelChange, cols = 128, rows = 64 }) {
+export default function PixelCanvas({
+  pixels,
+  cols = COLS,
+  rows = ROWS,
+  onPixelChange,
+  onStrokeStart,
+  tool = 'pen',
+}) {
   const canvasRef = useRef(null);
   const isDrawing = useRef(false);
 
@@ -66,6 +73,7 @@ export default function PixelCanvas({ pixels, onPixelChange, cols = 128, rows = 
 
   function handlePointerDown(e) {
     isDrawing.current = true;
+    onStrokeStart?.();
     const { x, y } = getCellFromEvent(e);
     onPixelChange?.(x, y);
   }
@@ -80,16 +88,21 @@ export default function PixelCanvas({ pixels, onPixelChange, cols = 128, rows = 
     isDrawing.current = false;
   }
 
+  const cursorStyle = tool === 'eyedropper' ? 'default' : 'crosshair';
+
   return (
     <canvas
       ref={canvasRef}
       width={canvasW}
       height={canvasH}
       className="pixel-canvas"
+      style={{ cursor: cursorStyle }}
       onPointerDown={handlePointerDown}
       onPointerMove={handlePointerMove}
       onPointerUp={handlePointerUp}
       onPointerLeave={handlePointerUp}
+      aria-label={`Pixel canvas ${cols}×${rows}`}
+      role="img"
     />
   );
 }

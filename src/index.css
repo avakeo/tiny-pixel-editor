@@ -1,12 +1,12 @@
 /* Design tokens — dark OLED theme */
 :root {
-  --bg: #0d0e14;
-  --surface: #13141e;
+  --bg: #0d0d0d;
+  --surface: #141414;
   --border: #1e2030;
   --text: #c9d1e0;
   --text-muted: #4a5168;
-  --accent: #00c3ff;
-  --accent-bg: rgba(0, 195, 255, 0.1);
+  --accent: #00bfff;
+  --accent-bg: rgba(0, 191, 255, 0.1);
   --btn-bg: #1a1c28;
 
   font: 16px/1.5 system-ui, 'Segoe UI', Roboto, sans-serif;
