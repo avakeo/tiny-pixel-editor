@@ -92,7 +92,7 @@ export default function PixelCanvas({
     isDrawing.current = false;
   }
 
-  const cursorStyle = tool === 'eyedropper' ? 'crosshair' : 'crosshair';
+  const cursorStyle = tool === 'eyedropper' ? 'default' : 'crosshair';
 
   return (
     <canvas

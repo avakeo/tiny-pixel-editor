@@ -106,7 +106,8 @@ export default function App() {
       setPixels((prev) => {
         let next;
         if (tool === 'bucket') {
-          next = floodFill(prev, x, y, 1, cols, rows);
+          const fillValue = prev[y * cols + x] === 1 ? 0 : 1;
+          next = floodFill(prev, x, y, fillValue, cols, rows);
         } else {
           next = [...prev];
           next[y * cols + x] = tool === 'pen' ? 1 : 0;
