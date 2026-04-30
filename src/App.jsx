@@ -1,36 +1,57 @@
 import { useState, useCallback } from 'react';
-import PixelCanvas, { COLS, ROWS } from './components/PixelCanvas';
+import PixelCanvas from './components/PixelCanvas';
+import SidePanel from './components/SidePanel';
+import { CANVAS_PRESETS, DEFAULT_PRESET, createPixelArray } from './lib/canvasEngine';
 import { lsGet, lsSet } from './lib/storage';
 import './App.css';
 
-const TOTAL_PIXELS = COLS * ROWS;
+function loadCanvasSize() {
+  const saved = lsGet('canvasSize');
+  if (saved) {
+    const preset = CANVAS_PRESETS.find((p) => p.cols === saved.cols && p.rows === saved.rows);
+    if (preset) return preset;
+  }
+  return DEFAULT_PRESET;
+}
 
-function loadPixels() {
+function loadPixels(cols, rows) {
+  const total = cols * rows;
   const saved = lsGet('frame:0');
-  if (Array.isArray(saved) && saved.length === TOTAL_PIXELS) return saved;
-  return new Array(TOTAL_PIXELS).fill(0);
+  if (Array.isArray(saved) && saved.length === total) return saved;
+  return createPixelArray(cols, rows);
 }
 
 function App() {
-  const [pixels, setPixels] = useState(loadPixels);
+  const [canvasSize, setCanvasSize] = useState(loadCanvasSize);
+  const [pixels, setPixels] = useState(() => loadPixels(canvasSize.cols, canvasSize.rows));
   const [tool, setTool] = useState('pen'); // 'pen' | 'eraser'
+
+  const { cols, rows } = canvasSize;
 
   const handlePixelChange = useCallback(
     (x, y) => {
-      if (x < 0 || x >= COLS || y < 0 || y >= ROWS) return;
+      if (x < 0 || x >= cols || y < 0 || y >= rows) return;
       setPixels((prev) => {
         const next = [...prev];
-        next[y * COLS + x] = tool === 'pen' ? 1 : 0;
+        next[y * cols + x] = tool === 'pen' ? 1 : 0;
         lsSet('frame:0', next);
         return next;
       });
     },
-    [tool],
+    [tool, cols, rows],
   );
 
   function handleClear() {
-    const blank = new Array(TOTAL_PIXELS).fill(0);
+    const blank = createPixelArray(cols, rows);
     setPixels(blank);
+    lsSet('frame:0', blank);
+  }
+
+  function handleCanvasSizeChange(preset) {
+    const blank = createPixelArray(preset.cols, preset.rows);
+    setCanvasSize(preset);
+    setPixels(blank);
+    lsSet('canvasSize', { cols: preset.cols, rows: preset.rows });
     lsSet('frame:0', blank);
   }
 
@@ -38,11 +59,16 @@ function App() {
     <div className="app">
       <header className="app-header">
         <h1 className="app-title">Tiny Pixel Editor</h1>
-        <p className="app-subtitle">128 × 64 OLED canvas</p>
+        <p className="app-subtitle">
+          {cols} × {rows} OLED canvas
+        </p>
       </header>
 
       <main className="app-main">
-        <PixelCanvas pixels={pixels} onPixelChange={handlePixelChange} />
+        <div className="app-body">
+          <PixelCanvas pixels={pixels} onPixelChange={handlePixelChange} cols={cols} rows={rows} />
+          <SidePanel canvasSize={canvasSize} onCanvasSizeChange={handleCanvasSizeChange} />
+        </div>
       </main>
 
       <footer className="app-toolbar">
