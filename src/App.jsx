@@ -5,6 +5,7 @@ import FloatingToolbar from './components/FloatingToolbar';
 import SidePanel from './components/SidePanel';
 import FrameStrip from './components/FrameStrip';
 import { lsGet, lsSet } from './lib/storage';
+import { isMac } from './lib/platform';
 import './App.css';
 
 function makeBlank(cols, rows) {
@@ -60,7 +61,24 @@ function generateExport(pixels, cols, rows, language, format) {
   const values = bytes.map((b) => (isHex ? `0x${b.toString(16).padStart(2, '0')}` : String(b)));
 
   if (language === 'MicroPython') {
-    return `# ${cols}x${rows} pixel bitmap\ndata = bytearray([\n  ${values.join(', ')}\n])`;
+    const chunkSize = 16;
+    const chunks = [];
+    for (let i = 0; i < values.length; i += chunkSize) {
+      chunks.push(values.slice(i, i + chunkSize).join(', '));
+    }
+    const dataLines = chunks.map((chunk) => `  ${chunk}`).join(',\n');
+    return [
+      'import framebuf',
+      '',
+      `# ${cols}x${rows} pixel bitmap (MONO_HLSB)`,
+      `data = bytearray([`,
+      dataLines,
+      `])`,
+      `fb = framebuf.FrameBuffer(data, ${cols}, ${rows}, framebuf.MONO_HLSB)`,
+      '',
+      'oled.blit(fb, 0, 0)',
+      'oled.show()',
+    ].join('\n');
   }
   return `// ${cols}x${rows} pixel bitmap\nconst uint8_t bitmap[] PROGMEM = {\n  ${values.join(', ')}\n};`;
 }
@@ -132,6 +150,27 @@ export default function App() {
     setRedoStack((r) => r.slice(0, -1));
   }, [redoStack]);
 
+  useEffect(() => {
+    function handleKeyDown(e) {
+      const ctrl = isMac() ? e.metaKey : e.ctrlKey;
+      if (!ctrl) return;
+      if (e.key === 'z' || e.key === 'Z') {
+        if (e.shiftKey) {
+          e.preventDefault();
+          handleRedo();
+        } else {
+          e.preventDefault();
+          handleUndo();
+        }
+      } else if (e.key === 'y' || e.key === 'Y') {
+        e.preventDefault();
+        handleRedo();
+      }
+    }
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [handleUndo, handleRedo]);
+
   const handleSizeChange = useCallback(({ cols: newCols, rows: newRows }) => {
     setDisplaySize({ cols: newCols, rows: newRows });
     const blank = makeBlank(newCols, newRows);
@@ -140,6 +179,27 @@ export default function App() {
     setUndoStack([]);
     setRedoStack([]);
   }, []);
+
+  useEffect(() => {
+    function handleKeyDown(e) {
+      if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT' || e.target.tagName === 'TEXTAREA') return;
+      if (e.ctrlKey || e.metaKey) {
+        if (e.key.toLowerCase() === 'z' && e.shiftKey) { e.preventDefault(); handleRedo(); }
+        else if (e.key.toLowerCase() === 'z') { e.preventDefault(); handleUndo(); }
+        else if (e.key === 'y') { e.preventDefault(); handleRedo(); }
+        return;
+      }
+      switch (e.key.toLowerCase()) {
+        case 'p': setTool('pen'); break;
+        case 'e': setTool('eraser'); break;
+        case 'f': setTool('bucket'); break;
+        case 'i': setTool('eyedropper'); break;
+        default: break;
+      }
+    }
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [handleUndo, handleRedo]);
 
   const handleExport = useCallback(() => {
     const code = generateExport(pixels, cols, rows, exportLanguage, exportFormat);
@@ -151,6 +211,11 @@ export default function App() {
     a.download = `bitmap_${cols}x${rows}.${ext}`;
     a.click();
     URL.revokeObjectURL(url);
+  }, [pixels, cols, rows, exportLanguage, exportFormat]);
+
+  const handleCopy = useCallback(() => {
+    const code = generateExport(pixels, cols, rows, exportLanguage, exportFormat);
+    return navigator.clipboard.writeText(code);
   }, [pixels, cols, rows, exportLanguage, exportFormat]);
 
   return (
@@ -194,6 +259,7 @@ export default function App() {
           exportFormat={exportFormat}
           onExportFormatChange={setExportFormat}
           onExport={handleExport}
+          onCopy={handleCopy}
         />
       </div>
 

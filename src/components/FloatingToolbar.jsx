@@ -1,10 +1,13 @@
 import './FloatingToolbar.css';
+import { isMac } from '../lib/platform';
+
+const MOD = isMac() ? '⌘' : 'Ctrl';
 
 const TOOLS = [
-  { id: 'pen', icon: '✏️', label: 'Pen' },
-  { id: 'eraser', icon: '◻️', label: 'Eraser' },
-  { id: 'bucket', icon: '🪣', label: 'Fill Bucket' },
-  { id: 'eyedropper', icon: '💧', label: 'Eyedropper' },
+  { id: 'pen', icon: '✏️', label: 'Pen', shortcut: 'P' },
+  { id: 'eraser', icon: '◻️', label: 'Eraser', shortcut: 'E' },
+  { id: 'bucket', icon: '🪣', label: 'Fill Bucket', shortcut: 'F' },
+  { id: 'eyedropper', icon: '💧', label: 'Eyedropper', shortcut: 'I' },
 ];
 
 export default function FloatingToolbar({
@@ -17,7 +20,7 @@ export default function FloatingToolbar({
 }) {
   return (
     <div className="floating-toolbar" role="toolbar" aria-label="Drawing tools">
-      {TOOLS.map(({ id, icon, label }) => (
+      {TOOLS.map(({ id, icon, label, shortcut }) => (
         <button
           key={id}
           type="button"
@@ -25,7 +28,7 @@ export default function FloatingToolbar({
           onClick={() => onToolChange(id)}
           aria-label={label}
           aria-pressed={tool === id}
-          title={label}
+          title={`${label} (${shortcut})`}
         >
           {icon}
         </button>
@@ -39,7 +42,7 @@ export default function FloatingToolbar({
         onClick={onUndo}
         disabled={!canUndo}
         aria-label="Undo"
-        title="Undo"
+        title={`Undo (${MOD}+Z)`}
       >
         ↩
       </button>
@@ -49,7 +52,7 @@ export default function FloatingToolbar({
         onClick={onRedo}
         disabled={!canRedo}
         aria-label="Redo"
-        title="Redo"
+        title={`Redo (${MOD}+Shift+Z / ${MOD}+Y)`}
       >
         ↪
       </button>
