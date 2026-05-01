@@ -100,6 +100,18 @@
   background: rgba(0, 191, 255, 0.2);
 }
 
+.copy-btn {
+  background: var(--btn-bg);
+  color: var(--text);
+  border-color: var(--border);
+  margin-top: 6px;
+}
+
+.copy-btn:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: var(--accent);
+}
+
 /* ── Mobile: collapse to a row below the canvas ──────────────── */
 @media (max-width: 767px) {
   .side-panel {
