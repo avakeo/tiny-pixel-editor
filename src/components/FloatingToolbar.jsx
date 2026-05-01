@@ -1,4 +1,7 @@
 import './FloatingToolbar.css';
+import { isMac } from '../lib/platform';
+
+const MOD = isMac() ? '⌘' : 'Ctrl';
 
 const TOOLS = [
   { id: 'pen', icon: '✏️', label: 'Pen', shortcut: 'P' },
@@ -39,7 +42,7 @@ export default function FloatingToolbar({
         onClick={onUndo}
         disabled={!canUndo}
         aria-label="Undo"
-        title="Undo (Ctrl+Z)"
+        title={`Undo (${MOD}+Z)`}
       >
         ↩
       </button>
@@ -49,7 +52,7 @@ export default function FloatingToolbar({
         onClick={onRedo}
         disabled={!canRedo}
         aria-label="Redo"
-        title="Redo (Ctrl+Y)"
+        title={`Redo (${MOD}+Shift+Z / ${MOD}+Y)`}
       >
         ↪
       </button>
