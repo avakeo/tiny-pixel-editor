@@ -73,7 +73,7 @@ export default function PixelCanvas({
 
   function handlePointerDown(e) {
     isDrawing.current = true;
-    onStrokeStart?.();
+    if (tool !== 'eyedropper') onStrokeStart?.();
     const { x, y } = getCellFromEvent(e);
     onPixelChange?.(x, y);
   }

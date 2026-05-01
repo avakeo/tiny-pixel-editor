@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import PixelCanvas, { COLS as DEFAULT_COLS, ROWS as DEFAULT_ROWS } from './components/PixelCanvas';
 import FloatingToolbar from './components/FloatingToolbar';
 import SidePanel from './components/SidePanel';
@@ -139,6 +139,27 @@ export default function App() {
     setUndoStack([]);
     setRedoStack([]);
   }, []);
+
+  useEffect(() => {
+    function handleKeyDown(e) {
+      if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT' || e.target.tagName === 'TEXTAREA') return;
+      if (e.ctrlKey || e.metaKey) {
+        if (e.key.toLowerCase() === 'z' && e.shiftKey) { e.preventDefault(); handleRedo(); }
+        else if (e.key.toLowerCase() === 'z') { e.preventDefault(); handleUndo(); }
+        else if (e.key === 'y') { e.preventDefault(); handleRedo(); }
+        return;
+      }
+      switch (e.key.toLowerCase()) {
+        case 'p': setTool('pen'); break;
+        case 'e': setTool('eraser'); break;
+        case 'f': setTool('bucket'); break;
+        case 'i': setTool('eyedropper'); break;
+        default: break;
+      }
+    }
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [handleUndo, handleRedo]);
 
   const handleExport = useCallback(() => {
     const code = generateExport(pixels, cols, rows, exportLanguage, exportFormat);
