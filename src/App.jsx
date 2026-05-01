@@ -1,9 +1,9 @@
-import { useState, useCallback, useRef } from 'react';
-import PixelCanvas, { COLS as DEFAULT_COLS, ROWS as DEFAULT_ROWS, CELL } from './components/PixelCanvas';
-import CanvasViewport from './components/CanvasViewport';
+import { useState, useCallback, useRef, useEffect, useLayoutEffect } from 'react';
+import PixelCanvas, { COLS as DEFAULT_COLS, ROWS as DEFAULT_ROWS } from './components/PixelCanvas';
 import FloatingToolbar from './components/FloatingToolbar';
 import SidePanel from './components/SidePanel';
 import FrameStrip from './components/FrameStrip';
+import ImageImportDialog from './components/ImageImportDialog';
 import { lsGet, lsSet } from './lib/storage';
 import { isMac } from './lib/platform';
 import './App.css';
@@ -95,10 +95,24 @@ export default function App() {
   const [exportFormat, setExportFormat] = useState('Hex');
 
   const pixelsRef = useRef(pixels);
-  pixelsRef.current = pixels;
+  useLayoutEffect(() => {
+    pixelsRef.current = pixels;
+  });
 
   const [frames] = useState([{ id: 'frame:0' }]);
   const [activeFrame] = useState(0);
+  const [importOpen, setImportOpen] = useState(false);
+  const [sharedFile, setSharedFile] = useState(null);
+
+  // Listen for images shared via Web Share Target API
+  useEffect(() => {
+    function handleShareTarget(e) {
+      setSharedFile(e.detail.file);
+      setImportOpen(true);
+    }
+    window.addEventListener('share-target-image', handleShareTarget);
+    return () => window.removeEventListener('share-target-image', handleShareTarget);
+  }, []);
 
   const handleStrokeStart = useCallback(() => {
     const snapshot = [...pixelsRef.current];
@@ -213,10 +227,13 @@ export default function App() {
     URL.revokeObjectURL(url);
   }, [pixels, cols, rows, exportLanguage, exportFormat]);
 
-  const handleCopy = useCallback(() => {
-    const code = generateExport(pixels, cols, rows, exportLanguage, exportFormat);
-    return navigator.clipboard.writeText(code);
-  }, [pixels, cols, rows, exportLanguage, exportFormat]);
+  const handleImportApply = useCallback((importedPixels) => {
+    setUndoStack((prev) => [...prev.slice(-49), [...pixelsRef.current]]);
+    setRedoStack([]);
+    setPixels(importedPixels);
+    lsSet('frame:0', importedPixels);
+    setImportOpen(false);
+  }, []);
 
   return (
     <div className="app">
@@ -235,6 +252,7 @@ export default function App() {
           onRedo={handleRedo}
           canUndo={undoStack.length > 0}
           canRedo={redoStack.length > 0}
+          onImport={() => setImportOpen(true)}
         />
 
         <main className="canvas-area">
@@ -269,6 +287,16 @@ export default function App() {
         onFrameSelect={() => {}}
         onAddFrame={() => {}}
       />
+
+      {importOpen && (
+        <ImageImportDialog
+          cols={cols}
+          rows={rows}
+          initialFile={sharedFile}
+          onApply={handleImportApply}
+          onClose={() => { setImportOpen(false); setSharedFile(null); }}
+        />
+      )}
     </div>
   );
 }

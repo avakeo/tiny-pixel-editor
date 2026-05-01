@@ -17,6 +17,7 @@ export default function FloatingToolbar({
   onRedo,
   canUndo,
   canRedo,
+  onImport,
 }) {
   return (
     <div className="floating-toolbar" role="toolbar" aria-label="Drawing tools">
@@ -55,6 +56,18 @@ export default function FloatingToolbar({
         title={`Redo (${MOD}+Shift+Z / ${MOD}+Y)`}
       >
         ↪
+      </button>
+
+      <hr className="toolbar-divider" aria-hidden="true" />
+
+      <button
+        type="button"
+        className="tool-btn"
+        onClick={onImport}
+        aria-label="Import image"
+        title="Import image"
+      >
+        🖼️
       </button>
     </div>
   );
