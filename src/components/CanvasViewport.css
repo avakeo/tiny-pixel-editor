@@ -1,0 +1,43 @@
+/* ── Viewport container ────────────────────────────────────────── */
+.canvas-viewport {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  touch-action: none;
+  user-select: none;
+}
+
+.canvas-viewport--grab {
+  cursor: grab !important;
+}
+
+.canvas-viewport--grabbing {
+  cursor: grabbing !important;
+}
+
+/* ── Transformable content wrapper ─────────────────────────────── */
+.canvas-viewport-content {
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform-origin: 0 0;
+  will-change: transform;
+}
+
+/* ── Zoom level badge ───────────────────────────────────────────── */
+.zoom-badge {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  background: rgba(13, 13, 13, 0.85);
+  color: #00bfff;
+  font-size: 0.7rem;
+  font-family: monospace;
+  padding: 3px 8px;
+  border-radius: 4px;
+  border: 1px solid #1e2030;
+  pointer-events: none;
+  user-select: none;
+  letter-spacing: 0.05em;
+  z-index: 10;
+}

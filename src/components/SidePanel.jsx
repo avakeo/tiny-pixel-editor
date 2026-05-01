@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import './SidePanel.css';
 
 const DISPLAY_SIZES = [
@@ -19,7 +20,20 @@ export default function SidePanel({
   exportFormat,
   onExportFormatChange,
   onExport,
+  onCopy,
 }) {
+  const [copied, setCopied] = useState(false);
+
+  function handleCopyClick() {
+    Promise.resolve(onCopy())
+      .then(() => {
+        setCopied(true);
+        setTimeout(() => setCopied(false), 1500);
+      })
+      .catch(() => {
+        setCopied(false);
+      });
+  }
   return (
     <aside className="side-panel" aria-label="Settings panel">
       <section className="panel-section">
@@ -88,6 +102,14 @@ export default function SidePanel({
           aria-label="Export pixel data"
         >
           ⬇ Export
+        </button>
+        <button
+          type="button"
+          className="export-btn copy-btn"
+          onClick={handleCopyClick}
+          aria-label="Copy pixel data to clipboard"
+        >
+          {copied ? '✓ Copied!' : '⎘ Copy'}
         </button>
       </section>
     </aside>
