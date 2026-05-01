@@ -1,5 +1,6 @@
-import { useState, useCallback, useRef, useEffect } from 'react';
-import PixelCanvas, { COLS as DEFAULT_COLS, ROWS as DEFAULT_ROWS } from './components/PixelCanvas';
+import { useState, useCallback, useRef } from 'react';
+import PixelCanvas, { COLS as DEFAULT_COLS, ROWS as DEFAULT_ROWS, CELL } from './components/PixelCanvas';
+import CanvasViewport from './components/CanvasViewport';
 import FloatingToolbar from './components/FloatingToolbar';
 import SidePanel from './components/SidePanel';
 import FrameStrip from './components/FrameStrip';
@@ -237,14 +238,16 @@ export default function App() {
         />
 
         <main className="canvas-area">
-          <PixelCanvas
-            pixels={pixels}
-            cols={cols}
-            rows={rows}
-            tool={tool}
-            onPixelChange={handlePixelChange}
-            onStrokeStart={handleStrokeStart}
-          />
+          <CanvasViewport canvasWidth={cols * CELL} canvasHeight={rows * CELL}>
+            <PixelCanvas
+              pixels={pixels}
+              cols={cols}
+              rows={rows}
+              tool={tool}
+              onPixelChange={handlePixelChange}
+              onStrokeStart={handleStrokeStart}
+            />
+          </CanvasViewport>
         </main>
 
         <SidePanel

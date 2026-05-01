@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react';
 import './PixelCanvas.css';
 
-const CELL = 6;
+export const CELL = 6;
 
 /** Default OLED display dimensions (128×64) */
 export const COLS = 128;
